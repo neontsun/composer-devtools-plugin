@@ -1,0 +1,66 @@
+{
+    "name": "neontsun/composer-devtools-plugin",
+    "description": "Plugin for managing dependencies across multiple projects",
+    "license": "MIT",
+    "type": "composer-plugin",
+    "authors": [
+        {
+            "name": "Anton Kruglov",
+            "email": "usualtsun@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "composer-plugin-api": "^2.6"
+    },
+    "require-dev": {
+        "bamarni/composer-bin-plugin": "^1.8",
+        "composer/composer": "^2.8",
+        "ergebnis/composer-normalize": "^2.45",
+        "phpunit/phpunit": "^11.5"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Neontsun\\ComposerDevtoolsPlugin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Neontsun\\ComposerDevtoolsPlugin\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true,
+            "ergebnis/composer-normalize": true
+        }
+    },
+    "extra": {
+        "bamarni-bin": {
+            "bin-links": false,
+            "forward-command": true,
+            "target-directory": "tools"
+        },
+        "class": "Neontsun\\ComposerDevtoolsPlugin\\Plugin"
+    },
+    "scripts": {
+        "analyze-dependency": "tools/composer-dependency-analyzer/vendor/bin/composer-dependency-analyser --config composer-dependency-analyser.php --show-all-usages --verbose",
+        "cscheck": "PHP_CS_FIXER_IGNORE_ENV=1 tools/php-cs-fixer/vendor/bin/php-cs-fixer check --config=.php-cs-fixer.dist.php --show-progress=bar --diff -vvv",
+        "csfix": "PHP_CS_FIXER_IGNORE_ENV=1 tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --show-progress=bar --diff -vvv",
+        "lint": [
+            "@rector",
+            "@csfix"
+        ],
+        "phpstan": "tools/phpstan/vendor/bin/phpstan analyse --autoload-file vendor/autoload.php --configuration phpstan.dist.neon",
+        "phpstan-baseline": "tools/phpstan/vendor/bin/phpstan analyse --autoload-file vendor/autoload.php --configuration phpstan.dist.neon --generate-baseline phpstan-baseline.neon",
+        "quality": [
+            "@phpstan",
+            "@tests",
+            "@analyze-dependency"
+        ],
+        "rector": "tools/rector/vendor/bin/rector process --config=rector.php --ansi",
+        "tests": "vendor/bin/phpunit --configuration phpunit.xml",
+        "tests-coverage-stdout": "XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text=php://stdout"
+    }
+}

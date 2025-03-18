@@ -1,0 +1,18 @@
+parameters:
+    level: 10
+    paths:
+        - src
+        - tests
+    parallel:
+        jobSize: 20
+        maximumNumberOfProcesses: 32
+        minimumNumberOfJobsPerProcess: 2
+    tmpDir: ./var/.rector/.phpstan
+    reportMaybesInMethodSignatures: false
+    reportWrongPhpDocTypeInVarTag: true
+    checkMissingCallableSignature: true
+    exceptions:
+        reportUncheckedExceptionDeadCatch: false
+        check:
+            tooWideThrowType: false
+            missingCheckedExceptionInThrows: true

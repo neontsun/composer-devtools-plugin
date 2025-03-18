@@ -1,0 +1,6 @@
+/vendor/
+.idea
+composer.lock
+var
+tools/*/composer.lock
+tools/*/vendor

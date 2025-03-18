@@ -1,0 +1,9 @@
+{
+    "require-dev": {
+        "shipmonk/composer-dependency-analyser": "^1.8"
+    },
+    "config": {
+        "sort-packages": true,
+        "bump-after-update": "dev"
+    }
+}

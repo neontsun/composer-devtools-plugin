@@ -1,0 +1,25 @@
+includes:
+    - tools/phpstan/vendor/phpstan/phpstan/conf/bleedingEdge.neon
+    - tools/phpstan/vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - tools/phpstan/vendor/phpstan/phpstan-strict-rules/rules.neon
+
+parameters:
+    level: 10
+    paths:
+        - src
+        - tests
+    parallel:
+        jobSize: 40
+        maximumNumberOfProcesses: 1
+        minimumNumberOfJobsPerProcess: 1
+    tmpDir: ./var/.phpstan
+    strictRules:
+        disallowedShortTernary: false
+    reportMaybesInMethodSignatures: false
+    reportWrongPhpDocTypeInVarTag: true
+    checkMissingCallableSignature: true
+    exceptions:
+        reportUncheckedExceptionDeadCatch: false
+        check:
+            tooWideThrowType: false
+            missingCheckedExceptionInThrows: true
