@@ -60,11 +60,6 @@ return RectorConfig::configure()
         SetList::PHP_84,
     ])
     ->withRules([
-        /*
-        |--------------------------------------------------------------------------
-        | Visibility
-        |--------------------------------------------------------------------------
-        */
         ChangeConstantVisibilityRector::class,
         ChangeMethodVisibilityRector::class,
         ExplicitPublicClassMethodRector::class,
