@@ -55,7 +55,7 @@ final readonly class Config
                 ),
             );
         }
-		
+
         $this->repository = $repository;
     }
 
@@ -66,14 +66,14 @@ final readonly class Config
     {
         return new self($composer->getPackage()->getExtra());
     }
-	
+
     public function getRepository(): string
     {
         return $this->repository;
     }
-	
-	public function repositoryIsEmpty(): bool
-	{
-		return '' === $this->repository;
-	}
+
+    public function repositoryIsEmpty(): bool
+    {
+        return '' === $this->repository;
+    }
 }
