@@ -1,9 +1,15 @@
 {
     "name": "neontsun/composer-devtools-plugin",
-    "version": "1.0.0",
-    "description": "Plugin for managing dependencies across multiple projects",
+    "description": "Plugin for using and updating development tools when working on multiple projects",
     "license": "MIT",
     "type": "composer-plugin",
+    "keywords": [
+        "composer",
+        "dependency",
+        "tools",
+        "dev",
+        "plugin"
+    ],
     "authors": [
         {
             "name": "Anton Kruglov",
@@ -37,7 +43,11 @@
             "bamarni/composer-bin-plugin": true,
             "ergebnis/composer-normalize": true
         },
-        "bump-after-update": true
+        "bump-after-update": true,
+        "platform": {
+            "php": "8.2"
+        },
+        "sort-packages": true
     },
     "extra": {
         "bamarni-bin": {
