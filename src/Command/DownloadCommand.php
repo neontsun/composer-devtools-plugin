@@ -89,7 +89,7 @@ final class DownloadCommand extends BaseCommand
             $package,
         );
 
-        $this->logger->debug(sprintf('completion of <info>%s</info> execution', self::class));
+        $this->logger->debug(sprintf('Completion of <info>%s</info> execution', self::class));
 
         return self::SUCCESS;
     }
