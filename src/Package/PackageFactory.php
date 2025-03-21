@@ -16,7 +16,7 @@ final class PackageFactory
     {
         $temporaryPackage = new TemporaryPackage();
         $temporaryPackage->setDistType('zip');
-        $temporaryPackage->setDistUrl($config->getRepository());
+        $temporaryPackage->setDistUrl($config->getSourceLink());
 
         return $temporaryPackage;
     }
