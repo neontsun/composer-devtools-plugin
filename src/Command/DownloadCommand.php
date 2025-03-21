@@ -62,22 +62,16 @@ final class DownloadCommand extends BaseCommand
         $this->logger->debug(sprintf('Starting execute <info>%s</info>', self::class));
 
         $composer = $this->requireComposer();
-
+		
         $config = Config::fromComposer($composer);
-
-        if ($config->repositoryIsEmpty()) {
-            $this->logger->info('The repository option in the configuration is not filled in. The event processing has been terminated.');
-
-            return self::SUCCESS;
-        }
-
-        $this->logger->info('The repository option in the configuration is filled. Event processing continues.');
-
         $currentWorkingDir = getcwd();
-        $destinationDir = implode(DIRECTORY_SEPARATOR, [$currentWorkingDir, 'tools']);
-
-        $this->logger->debug(sprintf('Current working directory: <comment>%s</comment>', $currentWorkingDir));
-
+		
+		$this->logger->debug(sprintf('Current working directory: <comment>%s</comment>', $currentWorkingDir));
+		
+        $destinationDir = $currentWorkingDir . DIRECTORY_SEPARATOR . $config->getTargetDirectory();
+		
+		$this->logger->debug(sprintf('Target directory to download and install: <comment>%s</comment>', $destinationDir));
+		
         $package = PackageFactory::create($config);
 
         $this->logger->debug('Success create temporary package');
