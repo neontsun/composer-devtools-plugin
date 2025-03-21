@@ -24,12 +24,17 @@ final class ConfigTest extends TestCase
      */
     #[Test]
     #[DataProvider('configProvider')]
-    public function successInstantiatedConfig(array $extra, string $expectedRepository, bool $expectedRepositoryEmpty): void
-    {
+    public function successInstantiatedConfig(
+		array $extra, 
+		string $expectedRepository,
+		string $expectedTargetDirectory,
+		bool $expectedNeedUpdateGitIgnore,
+	): void {
         $config = new Config($extra);
 
-        self::assertSame($expectedRepository, $config->getRepository());
-        self::assertSame($expectedRepositoryEmpty, $config->repositoryIsEmpty());
+        self::assertSame($expectedRepository, $config->getSourceLink());
+        self::assertSame($expectedTargetDirectory, $config->getTargetDirectory());
+        self::assertSame($expectedNeedUpdateGitIgnore, $config->needUpdateGitIgnore());
     }
 
     /**
@@ -52,38 +57,40 @@ final class ConfigTest extends TestCase
      */
     public static function configProvider(): iterable
     {
-        yield 'default value' => [
-            [],
-            '',
-            true,
-        ];
-
-        yield 'empty extra key' => [
-            [
-                'unknown' => [],
-            ],
-            '',
-            true,
-        ];
-
-        yield 'as default but explicit' => [
+        yield 'explicit source link' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
-                    Config::REPOSITORY => '',
-                ],
-            ],
-            '',
-            true,
-        ];
-
-        yield 'explicit' => [
-            [
-                Config::EXTRA_CONFIG_KEY => [
-                    Config::REPOSITORY => 'https://github.com/neontsun/composer-devtools-plugin',
+                    Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
                 ],
             ],
             'https://github.com/neontsun/composer-devtools-plugin',
-            false,
+            Config::TARGET_DIRECTORY_DEFAULT,
+			Config::UPDATE_GITIGNORE_DEFAULT,
+        ];
+
+        yield 'explicit source link and target directory' => [
+            [
+                Config::EXTRA_CONFIG_KEY => [
+                    Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+					Config::TARGET_DIRECTORY => 'utils',
+                ],
+            ],
+            'https://github.com/neontsun/composer-devtools-plugin',
+            'utils',
+			Config::UPDATE_GITIGNORE_DEFAULT,
+        ];
+
+        yield 'explicit all' => [
+            [
+                Config::EXTRA_CONFIG_KEY => [
+                    Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+					Config::TARGET_DIRECTORY => 'utils',
+					Config::UPDATE_GITIGNORE => false,
+                ],
+            ],
+            'https://github.com/neontsun/composer-devtools-plugin',
+            'utils',
+			false,
         ];
     }
 
@@ -101,17 +108,83 @@ final class ConfigTest extends TestCase
                 Config::EXTRA_CONFIG_KEY,
             ),
         ];
-
-        yield 'non string repository' => [
+		
+		yield 'empty config' => [
+			[
+				Config::EXTRA_CONFIG_KEY => [],
+			],
+			sprintf(
+				'Expected setting "extra.%s.%s" to be a string value. Got "null".',
+				Config::EXTRA_CONFIG_KEY,
+				Config::SOURCE_LINK,
+			),
+		];
+		
+        yield 'non string source link' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
-                    Config::REPOSITORY => 123,
+                    Config::SOURCE_LINK => 123,
                 ],
             ],
             sprintf(
                 'Expected setting "extra.%s.%s" to be a string value. Got "int".',
                 Config::EXTRA_CONFIG_KEY,
-                Config::REPOSITORY,
+                Config::SOURCE_LINK,
+            ),
+        ];
+
+        yield 'empty string source link' => [
+            [
+                Config::EXTRA_CONFIG_KEY => [
+                    Config::SOURCE_LINK => '',
+                ],
+            ],
+            sprintf(
+                'Expected setting "extra.%s.%s" to be a non-empty-string value.',
+                Config::EXTRA_CONFIG_KEY,
+                Config::SOURCE_LINK,
+            ),
+        ];
+
+        yield 'non string target directory' => [
+            [
+                Config::EXTRA_CONFIG_KEY => [
+					Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+                    Config::TARGET_DIRECTORY => 123,
+                ],
+            ],
+            sprintf(
+                'Expected setting "extra.%s.%s" to be a string value. Got "int".',
+                Config::EXTRA_CONFIG_KEY,
+                Config::TARGET_DIRECTORY,
+            ),
+        ];
+
+        yield 'empty string target directory' => [
+            [
+                Config::EXTRA_CONFIG_KEY => [
+					Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+                    Config::TARGET_DIRECTORY => '',
+                ],
+            ],
+            sprintf(
+                'Expected setting "extra.%s.%s" to be a non-empty-string value.',
+                Config::EXTRA_CONFIG_KEY,
+                Config::TARGET_DIRECTORY,
+            ),
+        ];
+
+        yield 'non bool update gitignore' => [
+            [
+                Config::EXTRA_CONFIG_KEY => [
+					Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+                    Config::UPDATE_GITIGNORE => '',
+                ],
+            ],
+            sprintf(
+                'Expected setting "extra.%s.%s" to be a bool value. Got "string".',
+                Config::EXTRA_CONFIG_KEY,
+                Config::UPDATE_GITIGNORE,
             ),
         ];
     }
