@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Neontsun\Composer\Devtools;
 
+use Composer\Command\BaseCommand;
 use Composer\Composer;
 use Composer\Console\Application;
 use Composer\EventDispatcher\EventSubscriberInterface;
@@ -15,6 +16,7 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Neontsun\Composer\Devtools\Command\DownloadCommand;
+use Neontsun\Composer\Devtools\Command\InstallCommand;
 use Neontsun\Composer\Devtools\Command\UpdateGitIgnoreCommand;
 use Neontsun\Composer\Devtools\Config\Config;
 use Neontsun\Composer\Devtools\Exception\InvalidComposerExtraConfigException;
@@ -58,33 +60,33 @@ final class Plugin implements Capable, EventSubscriberInterface, PluginInterface
             ScriptEvents::POST_UPDATE_CMD => 'onPostUpdate',
         ];
     }
-	
-	/**
-	 * @throws ExceptionInterface
-	 * @throws InvalidComposerExtraConfigException
-	 */
+
+    /**
+     * @throws ExceptionInterface
+     * @throws InvalidComposerExtraConfigException
+     */
     public function onPostInstall(Event $event): void
     {
         $this->logger->debug(sprintf('Start handling <info>%s</info> event', ScriptEvents::POST_INSTALL_CMD));
 
         $this->proxyToEventHandlerWithPublicIOResolve($event);
     }
-	
-	/**
-	 * @throws ExceptionInterface
-	 * @throws InvalidComposerExtraConfigException
-	 */
+
+    /**
+     * @throws ExceptionInterface
+     * @throws InvalidComposerExtraConfigException
+     */
     public function onPostUpdate(Event $event): void
     {
         $this->logger->debug(sprintf('Start handling <info>%s</info> event', ScriptEvents::POST_UPDATE_CMD));
 
         $this->proxyToEventHandlerWithPublicIOResolve($event);
     }
-	
-	/**
-	 * @throws ExceptionInterface
-	 * @throws InvalidComposerExtraConfigException
-	 */
+
+    /**
+     * @throws ExceptionInterface
+     * @throws InvalidComposerExtraConfigException
+     */
     private function proxyToEventHandlerWithPublicIOResolve(Event $event): void
     {
         $io = $event->getIO();
@@ -109,8 +111,8 @@ final class Plugin implements Capable, EventSubscriberInterface, PluginInterface
 
     /**
      * @throws ExceptionInterface
-	 * @throws InvalidComposerExtraConfigException
-	 */
+     * @throws InvalidComposerExtraConfigException
+     */
     private function onEvent(InputInterface $input, OutputInterface $output): void
     {
         $this->logger->debug('Starting event processing');
@@ -118,23 +120,40 @@ final class Plugin implements Capable, EventSubscriberInterface, PluginInterface
         $io = $this->io;
 
         $application = new Application();
-		$config = Config::fromComposer($this->composer);
+        $config = Config::fromComposer($this->composer);
+
+        $updateGitIgnoreCommand = null;
+
+        if ($config->needUpdateGitIgnore()) {
+            $updateGitIgnoreCommand = new UpdateGitIgnoreCommand();
+        }
 
         $downloadCommand = new DownloadCommand();
-        $downloadCommand->setComposer($this->composer);
-        $downloadCommand->setApplication($application);
-        $downloadCommand->setIO($io);
-		
-		$updateGitIgnoreCommand = null;
-		
-		if ($config->needUpdateGitIgnore()) {
-			$updateGitIgnoreCommand = new UpdateGitIgnoreCommand();
-			$updateGitIgnoreCommand->setComposer($this->composer);
-			$updateGitIgnoreCommand->setApplication($application);
-			$updateGitIgnoreCommand->setIO($io);
-		}
-		
+        $installCommand = new InstallCommand();
+
+        $this->fillCommand(
+            $application,
+            $io,
+            $downloadCommand,
+            $updateGitIgnoreCommand,
+            $installCommand,
+        );
+
         $downloadCommand->run($input, $output);
-		$updateGitIgnoreCommand?->run($input, $output);
+        $updateGitIgnoreCommand?->run($input, $output);
+        $installCommand->run($input, $output);
+    }
+
+    private function fillCommand(Application $application, IOInterface $io, ?BaseCommand ...$commands): void
+    {
+        foreach ($commands as $command) {
+            if (null === $command) {
+                continue;
+            }
+
+            $command->setComposer($this->composer);
+            $command->setApplication($application);
+            $command->setIO($io);
+        }
     }
 }

@@ -6,6 +6,7 @@ namespace Neontsun\Composer\Devtools\Provider;
 
 use Composer\Plugin\Capability\CommandProvider as CommandProviderCapability;
 use Neontsun\Composer\Devtools\Command\DownloadCommand;
+use Neontsun\Composer\Devtools\Command\InstallCommand;
 use Neontsun\Composer\Devtools\Command\UpdateGitIgnoreCommand;
 use Symfony\Component\Console\Exception\LogicException;
 
@@ -18,7 +19,8 @@ final readonly class CommandProvider implements CommandProviderCapability
     {
         return [
             new DownloadCommand(),
-			new UpdateGitIgnoreCommand(),
+            new UpdateGitIgnoreCommand(),
+            new InstallCommand(),
         ];
     }
 }
