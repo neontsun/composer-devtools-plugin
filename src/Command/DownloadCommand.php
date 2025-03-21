@@ -62,16 +62,20 @@ final class DownloadCommand extends BaseCommand
         $this->logger->debug(sprintf('Starting execute <info>%s</info>', self::class));
 
         $composer = $this->requireComposer();
-		
+
         $config = Config::fromComposer($composer);
-        $currentWorkingDir = getcwd();
-		
-		$this->logger->debug(sprintf('Current working directory: <comment>%s</comment>', $currentWorkingDir));
-		
-        $destinationDir = $currentWorkingDir . DIRECTORY_SEPARATOR . $config->getTargetDirectory();
-		
-		$this->logger->debug(sprintf('Target directory to download and install: <comment>%s</comment>', $destinationDir));
-		
+        $currentWorkingDirectory = getcwd();
+
+        if (false === $currentWorkingDirectory) {
+            throw new RuntimeException('Unable to determine working directory');
+        }
+
+        $this->logger->debug(sprintf('Current working directory: <comment>%s</comment>', $currentWorkingDirectory));
+
+        $destinationDir = $currentWorkingDirectory . DIRECTORY_SEPARATOR . $config->getTargetDirectory();
+
+        $this->logger->debug(sprintf('Target directory to download and install: <comment>%s</comment>', $destinationDir));
+
         $package = PackageFactory::create($config);
 
         $this->logger->debug('Success create temporary package');

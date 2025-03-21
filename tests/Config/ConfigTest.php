@@ -25,11 +25,11 @@ final class ConfigTest extends TestCase
     #[Test]
     #[DataProvider('configProvider')]
     public function successInstantiatedConfig(
-		array $extra, 
-		string $expectedRepository,
-		string $expectedTargetDirectory,
-		bool $expectedNeedUpdateGitIgnore,
-	): void {
+        array $extra,
+        string $expectedRepository,
+        string $expectedTargetDirectory,
+        bool $expectedNeedUpdateGitIgnore,
+    ): void {
         $config = new Config($extra);
 
         self::assertSame($expectedRepository, $config->getSourceLink());
@@ -65,32 +65,32 @@ final class ConfigTest extends TestCase
             ],
             'https://github.com/neontsun/composer-devtools-plugin',
             Config::TARGET_DIRECTORY_DEFAULT,
-			Config::UPDATE_GITIGNORE_DEFAULT,
+            Config::UPDATE_GITIGNORE_DEFAULT,
         ];
 
         yield 'explicit source link and target directory' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
                     Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
-					Config::TARGET_DIRECTORY => 'utils',
+                    Config::TARGET_DIRECTORY => 'utils',
                 ],
             ],
             'https://github.com/neontsun/composer-devtools-plugin',
             'utils',
-			Config::UPDATE_GITIGNORE_DEFAULT,
+            Config::UPDATE_GITIGNORE_DEFAULT,
         ];
 
         yield 'explicit all' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
                     Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
-					Config::TARGET_DIRECTORY => 'utils',
-					Config::UPDATE_GITIGNORE => false,
+                    Config::TARGET_DIRECTORY => 'utils',
+                    Config::UPDATE_GITIGNORE => false,
                 ],
             ],
             'https://github.com/neontsun/composer-devtools-plugin',
             'utils',
-			false,
+            false,
         ];
     }
 
@@ -108,18 +108,18 @@ final class ConfigTest extends TestCase
                 Config::EXTRA_CONFIG_KEY,
             ),
         ];
-		
-		yield 'empty config' => [
-			[
-				Config::EXTRA_CONFIG_KEY => [],
-			],
-			sprintf(
-				'Expected setting "extra.%s.%s" to be a string value. Got "null".',
-				Config::EXTRA_CONFIG_KEY,
-				Config::SOURCE_LINK,
-			),
-		];
-		
+
+        yield 'empty config' => [
+            [
+                Config::EXTRA_CONFIG_KEY => [],
+            ],
+            sprintf(
+                'Expected setting "extra.%s.%s" to be a string value. Got "null".',
+                Config::EXTRA_CONFIG_KEY,
+                Config::SOURCE_LINK,
+            ),
+        ];
+
         yield 'non string source link' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
@@ -149,7 +149,7 @@ final class ConfigTest extends TestCase
         yield 'non string target directory' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
-					Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+                    Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
                     Config::TARGET_DIRECTORY => 123,
                 ],
             ],
@@ -163,7 +163,7 @@ final class ConfigTest extends TestCase
         yield 'empty string target directory' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
-					Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+                    Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
                     Config::TARGET_DIRECTORY => '',
                 ],
             ],
@@ -177,7 +177,7 @@ final class ConfigTest extends TestCase
         yield 'non bool update gitignore' => [
             [
                 Config::EXTRA_CONFIG_KEY => [
-					Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
+                    Config::SOURCE_LINK => 'https://github.com/neontsun/composer-devtools-plugin',
                     Config::UPDATE_GITIGNORE => '',
                 ],
             ],
