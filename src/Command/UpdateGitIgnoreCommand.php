@@ -82,6 +82,12 @@ final class UpdateGitIgnoreCommand extends BaseCommand
 		
 		$currentContent = Silencer::call('file_get_contents', $gitignorePath);
 		
+		if (! is_string($currentContent)) {
+			$this->logger->debug(sprintf('<warning>Reading %s return not string</warning>', $gitignorePath));
+			
+			return self::FAILURE;
+		}
+		
 		$this->logger->debug(sprintf('Check target directory exist in <comment>%s</comment> file and append if dont', $gitignorePath));
 		
 		$currentContentArray = explode(PHP_EOL, $currentContent);
@@ -100,7 +106,7 @@ final class UpdateGitIgnoreCommand extends BaseCommand
 		
 		$success = (new Filesystem())->filePutContentsIfModified($gitignorePath, $currentContent);
 
-		if (! $success) {
+		if (false === $success || 0 === $success) {
 			$this->logger->debug(sprintf('<warning>Put to file %s with target directory ended is failure</warning>', $gitignorePath));
 			
 			return self::FAILURE;
