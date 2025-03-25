@@ -116,7 +116,13 @@ final class Plugin implements Capable, EventSubscriberInterface, PluginInterface
     private function onEvent(InputInterface $input, OutputInterface $output): void
     {
         $this->logger->debug('Starting event processing');
-
+		$this->logger->debug(
+			sprintf(
+				'Original input: <comment>%s</comment>.',
+				$input->__toString(),
+			),
+		);
+		
         $io = $this->io;
 
         $application = new Application();
