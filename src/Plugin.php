@@ -12,6 +12,8 @@ use Composer\IO\ConsoleIO;
 use Composer\IO\IOInterface;
 use Composer\Plugin\Capability\CommandProvider as ComposerCommandProvider;
 use Composer\Plugin\Capable;
+use Composer\Plugin\CommandEvent;
+use Composer\Plugin\PluginEvents;
 use Composer\Plugin\PluginInterface;
 use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
@@ -56,8 +58,8 @@ final class Plugin implements Capable, EventSubscriberInterface, PluginInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ScriptEvents::POST_INSTALL_CMD => 'onPostInstall',
-            ScriptEvents::POST_UPDATE_CMD => 'onPostUpdate',
+            PluginEvents::COMMAND => 'onCommand',
+            ScriptEvents::POST_AUTOLOAD_DUMP => 'onPostAutoloadDump',
         ];
     }
 
@@ -65,30 +67,25 @@ final class Plugin implements Capable, EventSubscriberInterface, PluginInterface
      * @throws ExceptionInterface
      * @throws InvalidComposerExtraConfigException
      */
-    public function onPostInstall(Event $event): void
+    public function onCommand(CommandEvent $event): void
     {
-        $this->logger->debug(sprintf('Start handling <info>%s</info> event', ScriptEvents::POST_INSTALL_CMD));
+        $this->logger->debug(sprintf('Start handling <info>%s</info> event', PluginEvents::COMMAND));
 
-        $this->proxyToEventHandlerWithPublicIOResolve($event);
+        $this->onEvent(
+            $event->getCommandName(),
+            $event->getInput(),
+            $event->getOutput(),
+        );
     }
 
     /**
      * @throws ExceptionInterface
      * @throws InvalidComposerExtraConfigException
      */
-    public function onPostUpdate(Event $event): void
+    public function onPostAutoloadDump(Event $event): void
     {
-        $this->logger->debug(sprintf('Start handling <info>%s</info> event', ScriptEvents::POST_UPDATE_CMD));
+        $this->logger->debug(sprintf('Start handling <info>%s</info> event', ScriptEvents::POST_AUTOLOAD_DUMP));
 
-        $this->proxyToEventHandlerWithPublicIOResolve($event);
-    }
-
-    /**
-     * @throws ExceptionInterface
-     * @throws InvalidComposerExtraConfigException
-     */
-    private function proxyToEventHandlerWithPublicIOResolve(Event $event): void
-    {
         $io = $event->getIO();
 
         if (! $io instanceof ConsoleIO) {
@@ -106,23 +103,43 @@ final class Plugin implements Capable, EventSubscriberInterface, PluginInterface
 
         $this->logger->debug('Public I/O resolved');
 
-        $this->onEvent($publicIO->getInput(), $publicIO->getOutput());
+		$eventInput = $publicIO->getInput();
+		$commandName = $eventInput->getArgument('command');
+		
+		if (! is_string($commandName) || '' === $commandName) {
+			$this->logger->debug('<warning>Canceling event processing because event input not contain command name</warning>');
+			
+			return;
+		}
+		
+        $this->onEvent(
+			$commandName,
+			$eventInput,
+            $publicIO->getOutput(),
+        );
     }
 
     /**
      * @throws ExceptionInterface
      * @throws InvalidComposerExtraConfigException
      */
-    private function onEvent(InputInterface $input, OutputInterface $output): void
+    private function onEvent(string $commandName, InputInterface $input, OutputInterface $output): void
     {
         $this->logger->debug('Starting event processing');
-		$this->logger->debug(
-			sprintf(
-				'Original input: <comment>%s</comment>.',
-				$input->__toString(),
-			),
-		);
-		
+
+        if ('install' !== $commandName) {
+            $this->logger->debug('Unsupported command. Canceling event processing');
+
+            return;
+        }
+
+        $this->logger->debug(
+            sprintf(
+                'Original input: <comment>%s</comment>.',
+                $input->__toString(),
+            ),
+        );
+
         $io = $this->io;
 
         $application = new Application();

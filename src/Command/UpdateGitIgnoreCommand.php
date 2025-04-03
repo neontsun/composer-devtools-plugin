@@ -30,14 +30,7 @@ final class UpdateGitIgnoreCommand extends BaseCommand
     ) {
         parent::__construct('devtools:update-gitignore');
     }
-	
-	protected function configure(): void
-	{
-		$this
-			->setDescription('Update .gitignore file')
-			->ignoreValidationErrors();
-	}
-	
+
     public function isProxyCommand(): bool
     {
         return false;
@@ -57,6 +50,13 @@ final class UpdateGitIgnoreCommand extends BaseCommand
         $this->logger = new Logger($io);
 
         return $io;
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDescription('Update .gitignore file')
+            ->ignoreValidationErrors();
     }
 
     /**

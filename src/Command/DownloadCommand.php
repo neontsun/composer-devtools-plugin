@@ -29,14 +29,7 @@ final class DownloadCommand extends BaseCommand
     ) {
         parent::__construct('devtools:download');
     }
-	
-	protected function configure(): void
-	{
-		$this
-			->setDescription('Download and install devtools repository')
-			->ignoreValidationErrors();
-	}
-	
+
     public function isProxyCommand(): bool
     {
         return false;
@@ -56,6 +49,13 @@ final class DownloadCommand extends BaseCommand
         $this->logger = new Logger($io);
 
         return $io;
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDescription('Download and install devtools repository')
+            ->ignoreValidationErrors();
     }
 
     /**

@@ -32,14 +32,7 @@ final class InstallCommand extends BaseCommand
     ) {
         parent::__construct('devtools:install');
     }
-	
-	protected function configure(): void
-	{
-		$this
-			->setDescription('Install dependencies in devtools namespaces')
-			->ignoreValidationErrors();
-	}
-	
+
     public function isProxyCommand(): bool
     {
         return true;
@@ -59,6 +52,13 @@ final class InstallCommand extends BaseCommand
         $this->logger = new Logger($io);
 
         return $io;
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setDescription('Install dependencies in devtools namespaces')
+            ->ignoreValidationErrors();
     }
 
     /**
